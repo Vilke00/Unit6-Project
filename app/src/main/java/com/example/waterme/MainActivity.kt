@@ -15,9 +15,13 @@
  */
 package com.example.waterme
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.waterme.adapater.PlantAdapter
 import com.example.waterme.adapater.PlantListener
@@ -35,6 +39,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        checkPermission("android.permission.POST_NOTIFICATIONS", 100)
+
         val adapter = PlantAdapter(PlantListener { plant ->
             val dialog = ReminderDialogFragment(plant.name)
             dialog.show(supportFragmentManager, "WaterReminderDialogFragment")
@@ -44,5 +50,14 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         val data = viewModel.plants
         adapter.submitList(data)
+    }
+
+    private fun checkPermission(permission: String, requestCode: Int) {
+        if (ContextCompat.checkSelfPermission(this@MainActivity, permission) == PackageManager.PERMISSION_DENIED) {
+            // Requesting the permission
+            ActivityCompat.requestPermissions(this@MainActivity, arrayOf(permission), requestCode)
+        } else {
+            Toast.makeText(this@MainActivity, "Permission already granted", Toast.LENGTH_SHORT).show()
+        }
     }
 }
